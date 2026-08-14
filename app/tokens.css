@@ -1,0 +1,70 @@
+/* Hallmark tokens · theme: Terminal (amber-phosphor drop) · anchor hue 55 */
+:root {
+  color-scheme: dark;
+
+  /* paper — elevation by lightness, never shadow-glow */
+  --color-paper: oklch(13% 0.012 55);
+  --color-paper-2: oklch(16.5% 0.014 55);
+  --color-paper-3: oklch(20.5% 0.016 55);
+  --color-rule: oklch(28% 0.014 55);
+
+  /* ink */
+  --color-ink: oklch(93% 0.008 75);
+  --color-muted: oklch(74% 0.012 60);
+  --color-neutral: oklch(58% 0.014 55);
+
+  /* accent — amber phosphor */
+  --color-accent: oklch(78% 0.145 60);
+  --color-accent-dim: oklch(78% 0.145 60 / 0.14);
+  --color-focus: oklch(75% 0.155 60);
+
+  /* visualization semantics */
+  --color-viz-bar: oklch(36% 0.02 55);
+  --color-viz-compare: oklch(78% 0.145 60);
+  --color-viz-swap: oklch(64% 0.185 25);
+  --color-viz-done: oklch(70% 0.125 150);
+  --color-viz-ink-on: oklch(15% 0.01 55);
+
+  /* type — JetBrains Mono display+code, Geist body (2 families) */
+  --font-display: var(--font-jb), ui-monospace, monospace;
+  --font-body: var(--font-geist), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-jb), ui-monospace, monospace;
+
+  /* scale — major third */
+  --text-xs: 0.8rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-md: 1.25rem;
+  --text-lg: 1.5625rem;
+  --text-xl: 1.9531rem;
+  --text-2xl: 2.4414rem;
+  --text-display: clamp(2.5rem, 4.5vw + 1rem, 4.5rem);
+
+  /* space — 4pt */
+  --space-3xs: 0.125rem;
+  --space-2xs: 0.25rem;
+  --space-xs: 0.5rem;
+  --space-sm: 0.75rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2.5rem;
+  --space-2xl: 4rem;
+  --space-3xl: 6rem;
+
+  /* motion */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in: cubic-bezier(0.7, 0, 0.84, 0);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-micro: 120ms;
+  --dur-short: 220ms;
+  --dur-long: 420ms;
+
+  /* z scale */
+  --z-base: 1;
+  --z-raised: 10;
+  --z-sticky: 200;
+
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+}

@@ -1,36 +1,53 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# stepwise()
 
-## Getting Started
+Interactive DSA learning. Every topic is real code you can step through line
+by line while a synced visualization shows exactly what the algorithm is
+doing — play, pause, scrub, change speed, and feed it your own input.
 
-First, run the development server:
+## Run it
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+npm run dev        # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## How it works
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+The core idea is a **tracer engine**, not hand-made animations per topic.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. An algorithm runs once, instrumented, and records a `Step[]`:
+   the executing source line, a snapshot of the array, highlight roles
+   (compare / swap / pivot / key / active range), and a one-line narration.
+2. The UI never runs the algorithm — the player just scrubs an index over
+   that array. Stepping backward is free.
+3. Array cells carry stable ids, so bars are keyed by identity and swaps
+   animate as physical slides (CSS `transform` transitions only).
 
-## Learn More
+```
+lib/trace.ts            Step / Highlight types + the Tracer recorder
+lib/algorithms/*.ts     one file per algorithm: display code, complexity,
+                        intuition paragraphs, and the instrumented trace()
+lib/input.ts            dataset presets (random / nearly sorted / reversed /
+                        few unique) + custom-input parsing
+components/playground.tsx   player state, transport, keyboard shortcuts
+components/code-panel.tsx   line-numbered source with active-line highlight
+components/array-viz.tsx    identity-keyed bars + state colors
+```
 
-To learn more about Next.js, take a look at the following resources:
+## Adding an algorithm
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Create `lib/algorithms/<name>.ts` exporting an `Algorithm`:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- `code` — the displayed source (keep it ≤ ~20 lines)
+- `trace(input)` — re-implement it against a `Tracer`, calling
+  `t.emit(line, note, highlights)` at every meaningful moment
+- `complexity` + `intuition` — the study content
 
-## Deploy on Vercel
+Register it in `lib/algorithms/index.ts`. The playground UI needs no changes.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Line numbers in `emit()` refer to the displayed `code` string — keep them in
+sync when editing either.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Keyboard
+
+`space` play/pause · `←` / `→` step · scrubber drags anywhere in the trace.
