@@ -23,6 +23,7 @@
   --color-viz-compare: oklch(78% 0.145 60);
   --color-viz-swap: oklch(64% 0.185 25);
   --color-viz-done: oklch(70% 0.125 150);
+  --color-viz-stack: oklch(50% 0.085 60);
   --color-viz-ink-on: oklch(15% 0.01 55);
 
   /* type — JetBrains Mono display+code, Geist body (2 families) */

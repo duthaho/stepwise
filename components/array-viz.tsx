@@ -2,7 +2,7 @@
 
 import { Step } from "@/lib/trace";
 
-type BarState = "idle" | "compare" | "swap" | "done" | "key" | "pivot";
+type BarState = "idle" | "compare" | "swap" | "done" | "key" | "pivot" | "stacked";
 
 function stateFor(index: number, step: Step): BarState {
   const { hl } = step;
@@ -11,6 +11,7 @@ function stateFor(index: number, step: Step): BarState {
   if (hl.pivot === index) return "pivot";
   if (hl.key === index) return "key";
   if (hl.compare?.includes(index)) return "compare";
+  if (hl.stack?.includes(index)) return "stacked";
   if (step.sorted.includes(index)) return "done";
   return "idle";
 }
@@ -18,11 +19,14 @@ function stateFor(index: number, step: Step): BarState {
 export function ArrayViz({
   step,
   reservePointerRow = false,
+  stackLabel,
   onBarClick,
 }: {
   step: Step;
   /** Keeps space under the bars for lo/mid/hi markers (searching topics). */
   reservePointerRow?: boolean;
+  /** Renders a chip strip of the stack/deque contents when hl.stack exists. */
+  stackLabel?: string;
   onBarClick?: (value: number) => void;
 }) {
   const n = step.cells.length;
@@ -48,7 +52,10 @@ export function ArrayViz({
     for (const [index, labels] of byIndex) pointerGroups.push({ index, labels });
   }
 
+  const stack = step.hl.stack;
+
   return (
+    <>
     <div
       className={[
         "viz-stage",
@@ -88,6 +95,18 @@ export function ArrayViz({
           </div>
         );
       })}
+      {step.hl.area && (
+        <div
+          className="viz-area"
+          style={{
+            ["--n" as string]: n,
+            ["--w" as string]: step.hl.area.to - step.hl.area.from + 1,
+            ["--from" as string]: step.hl.area.from,
+            ["--ah" as string]: Math.max(6, (step.hl.area.height / max) * 88),
+          }}
+          aria-hidden="true"
+        />
+      )}
       {pointerGroups.map(({ index, labels }) => (
         <div
           key={labels.join()}
@@ -99,10 +118,27 @@ export function ArrayViz({
         </div>
       ))}
     </div>
+    {stack !== undefined && (
+      <div className="stack-row" aria-label="Stack contents">
+        <span className="stack-label">{stackLabel ?? "stack"}</span>
+        {stack.length === 0 ? (
+          <span className="stack-empty">empty</span>
+        ) : (
+          stack
+            .filter((i) => i >= 0 && i < n)
+            .map((i) => (
+              <span key={i} className="stack-chip">
+                {step.cells[i].value}
+              </span>
+            ))
+        )}
+      </div>
+    )}
+    </>
   );
 }
 
-export function VizLegend({ kind }: { kind: "sort" | "search" }) {
+export function VizLegend({ kind }: { kind: "sort" | "search" | "stack" }) {
   const items: { label: string; token: string }[] =
     kind === "sort"
       ? [
@@ -111,11 +147,18 @@ export function VizLegend({ kind }: { kind: "sort" | "search" }) {
           { label: "settled", token: "var(--color-viz-done)" },
           { label: "untouched", token: "var(--color-viz-bar)" },
         ]
-      : [
-          { label: "probing", token: "var(--color-viz-compare)" },
-          { label: "found", token: "var(--color-viz-done)" },
-          { label: "candidates", token: "var(--color-viz-bar)" },
-        ];
+      : kind === "search"
+        ? [
+            { label: "probing", token: "var(--color-viz-compare)" },
+            { label: "found", token: "var(--color-viz-done)" },
+            { label: "candidates", token: "var(--color-viz-bar)" },
+          ]
+        : [
+            { label: "current", token: "var(--color-viz-compare)" },
+            { label: "on the stack", token: "var(--color-viz-stack)" },
+            { label: "resolved", token: "var(--color-viz-done)" },
+            { label: "untouched", token: "var(--color-viz-bar)" },
+          ];
   return (
     <div className="legend" aria-hidden="true">
       {items.map((it) => (

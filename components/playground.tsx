@@ -1,7 +1,11 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { SORTING_ALGORITHMS, SEARCHING_ALGORITHMS } from "@/lib/algorithms";
+import {
+  SORTING_ALGORITHMS,
+  SEARCHING_ALGORITHMS,
+  STACK_ALGORITHMS,
+} from "@/lib/algorithms";
 import { Algorithm } from "@/lib/trace";
 import {
   DEFAULT_INPUT,
@@ -23,17 +27,22 @@ import { ArrayViz, VizLegend } from "./array-viz";
 const SPEEDS = [0.5, 1, 2, 4];
 const BASE_MS = 600;
 
-export type TopicId = "sorting" | "searching";
+export type TopicId = "sorting" | "searching" | "stacks";
 
 const TOPICS: Record<
   TopicId,
-  { title: string; kind: "sort" | "search"; algorithms: Algorithm[] }
+  { title: string; kind: "sort" | "search" | "stack"; algorithms: Algorithm[] }
 > = {
   sorting: { title: "Sorting", kind: "sort", algorithms: SORTING_ALGORITHMS },
   searching: {
     title: "Searching",
     kind: "search",
     algorithms: SEARCHING_ALGORITHMS,
+  },
+  stacks: {
+    title: "Stacks & queues",
+    kind: "stack",
+    algorithms: STACK_ALGORITHMS,
   },
 };
 
@@ -82,11 +91,21 @@ export function Playground({ topic }: { topic: TopicId }) {
   );
   const [custom, setCustom] = useState("");
   const [customBad, setCustomBad] = useState(false);
+  const [param, setParam] = useState<number | null>(null);
 
   const alg = algorithms.find((a) => a.id === algId) ?? algorithms[0];
+  const paramMax = alg.param
+    ? Math.min(alg.param.max, input.length)
+    : undefined;
+  const paramVal = alg.param
+    ? Math.max(
+        alg.param.min,
+        Math.min(param ?? alg.param.default, paramMax ?? alg.param.max),
+      )
+    : undefined;
   const steps = useMemo(
-    () => alg.trace(input, isSearch ? target : undefined),
-    [alg, input, isSearch, target],
+    () => alg.trace(input, isSearch ? target : paramVal),
+    [alg, input, isSearch, target, paramVal],
   );
 
   const [cursor, setCursor] = useState(0);
@@ -227,6 +246,7 @@ export function Playground({ topic }: { topic: TopicId }) {
             <ArrayViz
               step={step}
               reservePointerRow={isSearch}
+              stackLabel={alg.stackLabel}
               onBarClick={isSearch ? setTargetInner : undefined}
             />
             <VizLegend kind={kind} />
@@ -409,6 +429,20 @@ export function Playground({ topic }: { topic: TopicId }) {
                 >
                   new array
                 </button>
+                {alg.param && (
+                  <label className="field">
+                    {alg.param.label} = {paramVal}
+                    <input
+                      type="range"
+                      className="size-range"
+                      min={alg.param.min}
+                      max={paramMax}
+                      value={paramVal}
+                      onChange={(e) => setParam(Number(e.target.value))}
+                      aria-label={alg.param.label}
+                    />
+                  </label>
+                )}
                 <label className="field">
                   own
                   <input

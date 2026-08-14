@@ -24,7 +24,9 @@ const TOPICS: {
   },
   {
     name: "Stacks & queues",
-    desc: "Monotonic stacks and the problems they quietly solve.",
+    desc: "Next greater, sliding window max, largest rectangle — the monotonic pattern.",
+    href: "/topics/stacks",
+    count: "3 algorithms",
   },
   {
     name: "Trees",

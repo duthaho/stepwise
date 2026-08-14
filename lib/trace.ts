@@ -26,6 +26,10 @@ export type Highlight = {
   pointers?: Record<string, number>;
   /** Index where a search concluded. */
   found?: number;
+  /** Indices currently held by a stack/deque, bottom→top (front→back). */
+  stack?: number[];
+  /** A candidate rectangle drawn over the bars (histogram problems). */
+  area?: { from: number; to: number; height: number };
 };
 
 export type Step = {
@@ -47,7 +51,11 @@ export type Algorithm = {
   facts: Fact[];
   /** Paragraphs: intuition first, then interview notes. */
   intuition: string[];
-  /** `target` is used by searching algorithms; sorting ignores it. */
+  /** Label for the stack chip strip, when the trace emits `hl.stack`. */
+  stackLabel?: string;
+  /** Extra numeric parameter (e.g. window size k), passed as trace's 2nd arg. */
+  param?: { label: string; min: number; max: number; default: number };
+  /** 2nd arg: search target, or the value of `param` for parameterized algorithms. */
   trace: (input: number[], target?: number) => Step[];
 };
 

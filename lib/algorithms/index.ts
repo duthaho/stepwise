@@ -7,6 +7,9 @@ import { quickSort } from "./quick";
 import { linearSearch } from "./linear-search";
 import { binarySearch } from "./binary-search";
 import { lowerBound } from "./lower-bound";
+import { nextGreater } from "./next-greater";
+import { windowMax } from "./window-max";
+import { histogramRect } from "./histogram-rect";
 
 export const SORTING_ALGORITHMS: Algorithm[] = [
   bubbleSort,
@@ -20,4 +23,10 @@ export const SEARCHING_ALGORITHMS: Algorithm[] = [
   linearSearch,
   binarySearch,
   lowerBound,
+];
+
+export const STACK_ALGORITHMS: Algorithm[] = [
+  nextGreater,
+  windowMax,
+  histogramRect,
 ];
