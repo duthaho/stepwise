@@ -8,9 +8,9 @@ const TOPICS: {
 }[] = [
   {
     name: "Sorting",
-    desc: "Bubble, insertion, selection, quick — watch elements slide into place.",
+    desc: "Bubble, insertion, selection, merge, quick — watch elements slide into place.",
     href: "/topics/sorting",
-    count: "4 algorithms",
+    count: "5 algorithms",
   },
   {
     name: "Searching",

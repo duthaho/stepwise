@@ -5,7 +5,7 @@ import { Playground } from "@/components/playground";
 export const metadata: Metadata = {
   title: "Sorting — Stepwise",
   description:
-    "Step through bubble, insertion, selection and quick sort line by line with a synced array visualization.",
+    "Step through bubble, insertion, selection, merge and quick sort line by line with a synced array visualization.",
 };
 
 export default function SortingPage() {

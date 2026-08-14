@@ -75,6 +75,12 @@ export class Tracer {
     this.arr[j] = t;
   }
 
+  /** Move the cell at `from` to `to`, shifting the cells in between. */
+  move(from: number, to: number) {
+    const [c] = this.arr.splice(from, 1);
+    this.arr.splice(to, 0, c);
+  }
+
   markSorted(...idx: number[]) {
     for (const i of idx) this.sorted.add(i);
   }
