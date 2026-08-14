@@ -13,6 +13,15 @@ import { histogramRect } from "./histogram-rect";
 import { reverseList } from "./reverse-list";
 import { middleList } from "./middle-list";
 import { cycleDetect } from "./cycle-detect";
+import { bstInsert } from "./bst-insert";
+import { bstSearch } from "./bst-search";
+import { inorderTraversal } from "./inorder";
+import { bfs } from "./bfs";
+import { dfs } from "./dfs";
+import { dijkstra } from "./dijkstra";
+import { climbStairs } from "./climb-stairs";
+import { houseRobber } from "./house-robber";
+import { lis } from "./lis";
 
 export const SORTING_ALGORITHMS: Algorithm[] = [
   bubbleSort,
@@ -39,3 +48,13 @@ export const LIST_ALGORITHMS: Algorithm[] = [
   middleList,
   cycleDetect,
 ];
+
+export const TREE_ALGORITHMS: Algorithm[] = [
+  bstInsert,
+  bstSearch,
+  inorderTraversal,
+];
+
+export const GRAPH_ALGORITHMS: Algorithm[] = [bfs, dfs, dijkstra];
+
+export const DP_ALGORITHMS: Algorithm[] = [climbStairs, houseRobber, lis];

@@ -52,6 +52,20 @@ export const SEARCH_PRESETS: { id: SearchPreset; label: string }[] = [
 export const DEFAULT_SEARCH_INPUT = [5, 13, 21, 25, 31, 42, 54, 60, 67, 76, 88, 95];
 export const DEFAULT_TARGET = 54;
 export const DEFAULT_LIST_INPUT = [42, 9, 67, 25, 88, 13, 54, 31];
+export const DEFAULT_TREE_INPUT = [42, 25, 67, 13, 31, 54, 88, 9, 76];
+export const DEFAULT_GRAPH_INPUT = [42, 9, 67, 25, 88, 13, 54, 31];
+
+/** Distinct values in random order — BSTs want no duplicates. */
+export function makeDistinctInput(n: number): number[] {
+  const set = new Set<number>();
+  while (set.size < n) set.add(randInt(5, 99));
+  const a = [...set];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = randInt(0, i);
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
 
 export function makeSearchInput(preset: SearchPreset, n: number): number[] {
   if (preset === "duplicates") {

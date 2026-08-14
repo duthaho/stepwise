@@ -32,15 +32,21 @@ const TOPICS: {
   },
   {
     name: "Trees",
-    desc: "Traversals, BST operations, balancing — drawn as they recurse.",
+    desc: "BST insert, search, in-order traversal — drawn as the tree grows and the walk descends.",
+    href: "/topics/trees",
+    count: "3 algorithms",
   },
   {
     name: "Graphs",
-    desc: "BFS, DFS, Dijkstra — the frontier, animated.",
+    desc: "BFS, DFS, Dijkstra — the frontier expands and distances settle on a live graph.",
+    href: "/topics/graphs",
+    count: "3 algorithms",
   },
   {
     name: "Dynamic programming",
-    desc: "Watch the table fill and the subproblems collapse.",
+    desc: "Min-cost stairs, house robber, LIS — watch each subproblem's answer fill in.",
+    href: "/topics/dp",
+    count: "3 algorithms",
   },
 ];
 

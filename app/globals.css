@@ -577,6 +577,142 @@ a.topic-row:hover .topic-name {
   pointer-events: none;
 }
 
+/* ---------- dp value labels under bars ---------- */
+
+.viz-stage.has-labels {
+  margin-bottom: var(--space-lg);
+}
+.bar-label {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  text-align: center;
+  padding-top: var(--space-2xs);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  font-variant-numeric: tabular-nums;
+  color: var(--color-accent);
+}
+.bar[data-state="done"] .bar-label {
+  color: var(--color-viz-done);
+}
+
+/* ---------- tree stage ---------- */
+
+.tree-stage {
+  padding: var(--space-lg) var(--space-md) var(--space-sm);
+  overflow-x: auto;
+}
+.tree-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 300px;
+  font-family: var(--font-mono);
+}
+.tree-edge {
+  stroke: var(--color-rule);
+  stroke-width: 1.5;
+}
+.tree-node {
+  fill: var(--color-paper-3);
+  stroke: var(--color-rule);
+  stroke-width: 1;
+  transition: fill var(--dur-micro) var(--ease-out);
+}
+.tree-node[data-state="compare"] {
+  fill: var(--color-viz-compare);
+  stroke: var(--color-viz-compare);
+}
+.tree-node[data-state="swap"] {
+  fill: var(--color-viz-stack);
+  stroke: var(--color-accent);
+}
+.tree-node[data-state="done"] {
+  fill: var(--color-viz-done);
+  stroke: var(--color-viz-done);
+}
+.tree-node[data-state="found"] {
+  fill: var(--color-viz-done);
+  stroke: var(--color-accent);
+  stroke-width: 2.5;
+}
+.tree-val {
+  fill: var(--color-muted);
+  font-size: 12px;
+  text-anchor: middle;
+  font-variant-numeric: tabular-nums;
+}
+.tree-val[data-state] {
+  fill: var(--color-viz-ink-on);
+  font-weight: 700;
+}
+
+/* ---------- graph stage ---------- */
+
+.graph-stage {
+  display: grid;
+  place-items: center;
+  padding: var(--space-md);
+}
+.graph-svg {
+  display: block;
+  width: 100%;
+  max-width: 320px;
+  height: auto;
+  font-family: var(--font-mono);
+}
+.graph-edge {
+  stroke: var(--color-rule);
+  stroke-width: 1.5;
+  transition: stroke var(--dur-micro) var(--ease-out);
+}
+.graph-edge.is-active {
+  stroke: var(--color-accent);
+  stroke-width: 2.5;
+}
+.graph-weight {
+  fill: var(--color-neutral);
+  font-size: 10px;
+  text-anchor: middle;
+}
+.graph-node {
+  fill: var(--color-paper-3);
+  stroke: var(--color-rule);
+  stroke-width: 1;
+  transition: fill var(--dur-micro) var(--ease-out);
+}
+.graph-node[data-state="compare"] {
+  fill: var(--color-viz-compare);
+  stroke: var(--color-viz-compare);
+}
+.graph-node[data-state="done"] {
+  fill: var(--color-viz-done);
+  stroke: var(--color-viz-done);
+}
+.graph-node[data-state="found"] {
+  fill: var(--color-viz-done);
+  stroke: var(--color-accent);
+  stroke-width: 2.5;
+}
+.graph-val {
+  fill: var(--color-muted);
+  font-size: 12px;
+  text-anchor: middle;
+  font-variant-numeric: tabular-nums;
+}
+.graph-val[data-state] {
+  fill: var(--color-viz-ink-on);
+  font-weight: 700;
+}
+.graph-dist {
+  fill: var(--color-accent);
+  font-size: 11px;
+  text-anchor: middle;
+  font-variant-numeric: tabular-nums;
+}
+
 /* ---------- linked-list stage ---------- */
 
 .list-stage {

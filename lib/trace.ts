@@ -32,6 +32,14 @@ export type Highlight = {
   area?: { from: number; to: number; height: number };
   /** Linked-list pointer state: links[i] = index node i points to, or null. */
   links?: (number | null)[];
+  /** Binary-tree shape: indices into cells. Nodes absent from the tree are not drawn. */
+  tree?: { root: number | null; left: (number | null)[]; right: (number | null)[] };
+  /** Undirected graph edges [u, v] or weighted [u, v, w]. Static per trace. */
+  graphEdges?: [number, number][] | [number, number, number][];
+  /** The edge currently being examined/relaxed. */
+  edge?: [number, number];
+  /** Per-index annotations (dp values, distances). null = not shown. */
+  labels?: (string | null)[];
 };
 
 export type Step = {
@@ -57,6 +65,8 @@ export type Algorithm = {
   stackLabel?: string;
   /** Extra numeric parameter (e.g. window size k), passed as trace's 2nd arg. */
   param?: { label: string; min: number; max: number; default: number };
+  /** Whether this algorithm takes a search target (2nd trace arg). */
+  usesTarget?: boolean;
   /** 2nd arg: search target, or the value of `param` for parameterized algorithms. */
   trace: (input: number[], target?: number) => Step[];
 };

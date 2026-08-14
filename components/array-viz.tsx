@@ -61,6 +61,7 @@ export function ArrayViz({
         "viz-stage",
         n > 16 ? "is-crowded" : "",
         reservePointerRow ? "has-pointers" : "",
+        step.hl.labels ? "has-labels" : "",
         onBarClick ? "is-clickable" : "",
       ]
         .filter(Boolean)
@@ -82,6 +83,9 @@ export function ArrayViz({
             }}
           >
             <span className="bar-val">{cell.value}</span>
+            {step.hl.labels?.[index] != null && (
+              <span className="bar-label">{step.hl.labels[index]}</span>
+            )}
             {onBarClick ? (
               <button
                 type="button"
@@ -138,38 +142,60 @@ export function ArrayViz({
   );
 }
 
-export function VizLegend({
-  kind,
-}: {
-  kind: "sort" | "search" | "stack" | "list";
-}) {
-  const items: { label: string; token: string }[] =
-    kind === "sort"
-      ? [
-          { label: "comparing", token: "var(--color-viz-compare)" },
-          { label: "swapping", token: "var(--color-viz-swap)" },
-          { label: "settled", token: "var(--color-viz-done)" },
-          { label: "untouched", token: "var(--color-viz-bar)" },
-        ]
-      : kind === "search"
-        ? [
-            { label: "probing", token: "var(--color-viz-compare)" },
-            { label: "found", token: "var(--color-viz-done)" },
-            { label: "candidates", token: "var(--color-viz-bar)" },
-          ]
-        : kind === "stack"
-          ? [
-              { label: "current", token: "var(--color-viz-compare)" },
-              { label: "on the stack", token: "var(--color-viz-stack)" },
-              { label: "resolved", token: "var(--color-viz-done)" },
-              { label: "untouched", token: "var(--color-viz-bar)" },
-            ]
-          : [
-              { label: "visiting", token: "var(--color-viz-compare)" },
-              { label: "rewiring", token: "var(--color-viz-swap)" },
-              { label: "processed", token: "var(--color-viz-done)" },
-              { label: "node", token: "var(--color-viz-bar)" },
-            ];
+export type VizKind =
+  | "sort"
+  | "search"
+  | "stack"
+  | "list"
+  | "tree"
+  | "graph"
+  | "dp";
+
+const LEGENDS: Record<VizKind, { label: string; token: string }[]> = {
+  sort: [
+    { label: "comparing", token: "var(--color-viz-compare)" },
+    { label: "swapping", token: "var(--color-viz-swap)" },
+    { label: "settled", token: "var(--color-viz-done)" },
+    { label: "untouched", token: "var(--color-viz-bar)" },
+  ],
+  search: [
+    { label: "probing", token: "var(--color-viz-compare)" },
+    { label: "found", token: "var(--color-viz-done)" },
+    { label: "candidates", token: "var(--color-viz-bar)" },
+  ],
+  stack: [
+    { label: "current", token: "var(--color-viz-compare)" },
+    { label: "on the stack", token: "var(--color-viz-stack)" },
+    { label: "resolved", token: "var(--color-viz-done)" },
+    { label: "untouched", token: "var(--color-viz-bar)" },
+  ],
+  list: [
+    { label: "visiting", token: "var(--color-viz-compare)" },
+    { label: "rewiring", token: "var(--color-viz-swap)" },
+    { label: "processed", token: "var(--color-viz-done)" },
+    { label: "node", token: "var(--color-viz-bar)" },
+  ],
+  tree: [
+    { label: "comparing", token: "var(--color-viz-compare)" },
+    { label: "descending", token: "var(--color-viz-swap)" },
+    { label: "placed / visited", token: "var(--color-viz-done)" },
+    { label: "node", token: "var(--color-viz-bar)" },
+  ],
+  graph: [
+    { label: "exploring", token: "var(--color-viz-compare)" },
+    { label: "settled", token: "var(--color-viz-done)" },
+    { label: "unvisited", token: "var(--color-viz-bar)" },
+  ],
+  dp: [
+    { label: "computing", token: "var(--color-viz-compare)" },
+    { label: "extending", token: "var(--color-viz-swap)" },
+    { label: "filled", token: "var(--color-viz-done)" },
+    { label: "cell", token: "var(--color-viz-bar)" },
+  ],
+};
+
+export function VizLegend({ kind }: { kind: VizKind }) {
+  const items = LEGENDS[kind];
   return (
     <div className="legend" aria-hidden="true">
       {items.map((it) => (
@@ -183,6 +209,12 @@ export function VizLegend({
       )}
       {kind === "list" && (
         <span className="legend-item legend-hint">∅ = null pointer</span>
+      )}
+      {kind === "graph" && (
+        <span className="legend-item legend-hint">numbers on edges = weights · labels = distance</span>
+      )}
+      {kind === "dp" && (
+        <span className="legend-item legend-hint">number under each bar = subproblem answer</span>
       )}
     </div>
   );

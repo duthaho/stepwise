@@ -6,15 +6,21 @@ import {
   SEARCHING_ALGORITHMS,
   STACK_ALGORITHMS,
   LIST_ALGORITHMS,
+  TREE_ALGORITHMS,
+  GRAPH_ALGORITHMS,
+  DP_ALGORITHMS,
 } from "@/lib/algorithms";
 import { Algorithm } from "@/lib/trace";
 import {
   DEFAULT_INPUT,
   DEFAULT_LIST_INPUT,
   DEFAULT_SEARCH_INPUT,
+  DEFAULT_TREE_INPUT,
+  DEFAULT_GRAPH_INPUT,
   DEFAULT_TARGET,
   makeInput,
   makeSearchInput,
+  makeDistinctInput,
   parseCustomInput,
   pickMissing,
   pickPresent,
@@ -24,37 +30,124 @@ import {
   SEARCH_PRESETS,
 } from "@/lib/input";
 import { CodePanel } from "./code-panel";
-import { ArrayViz, VizLegend } from "./array-viz";
+import { ArrayViz, VizLegend, VizKind } from "./array-viz";
 import { LinkedListViz } from "./linked-list-viz";
+import { TreeViz } from "./tree-viz";
+import { GraphViz } from "./graph-viz";
 
 const SPEEDS = [0.5, 1, 2, 4];
 const BASE_MS = 600;
 
-export type TopicId = "sorting" | "searching" | "stacks" | "linked-lists";
+export type TopicId =
+  | "sorting"
+  | "searching"
+  | "stacks"
+  | "linked-lists"
+  | "trees"
+  | "graphs"
+  | "dp";
 
-const TOPICS: Record<
-  TopicId,
-  {
-    title: string;
-    kind: "sort" | "search" | "stack" | "list";
-    algorithms: Algorithm[];
-  }
-> = {
-  sorting: { title: "Sorting", kind: "sort", algorithms: SORTING_ALGORITHMS },
+type Viz = "array" | "list" | "tree" | "graph";
+
+type KindCfg = {
+  title: string;
+  kind: VizKind;
+  viz: Viz;
+  algorithms: Algorithm[];
+  sizeMin: number;
+  sizeMax: number;
+  defaultInput: number[];
+  /** Sort-style preset dropdown + custom "own" array input. */
+  arrayControls: boolean;
+  /** Sorted-array search controls (preset + target + click-to-search). */
+  searchControls: boolean;
+  newLabel: string;
+};
+
+const TOPICS: Record<TopicId, KindCfg> = {
+  sorting: {
+    title: "Sorting",
+    kind: "sort",
+    viz: "array",
+    algorithms: SORTING_ALGORITHMS,
+    sizeMin: 5,
+    sizeMax: 24,
+    defaultInput: DEFAULT_INPUT,
+    arrayControls: true,
+    searchControls: false,
+    newLabel: "new array",
+  },
   searching: {
     title: "Searching",
     kind: "search",
+    viz: "array",
     algorithms: SEARCHING_ALGORITHMS,
+    sizeMin: 5,
+    sizeMax: 24,
+    defaultInput: DEFAULT_SEARCH_INPUT,
+    arrayControls: false,
+    searchControls: true,
+    newLabel: "new array",
   },
   stacks: {
     title: "Stacks & queues",
     kind: "stack",
+    viz: "array",
     algorithms: STACK_ALGORITHMS,
+    sizeMin: 5,
+    sizeMax: 24,
+    defaultInput: DEFAULT_INPUT,
+    arrayControls: true,
+    searchControls: false,
+    newLabel: "new array",
   },
   "linked-lists": {
     title: "Linked lists",
     kind: "list",
+    viz: "list",
     algorithms: LIST_ALGORITHMS,
+    sizeMin: 3,
+    sizeMax: 12,
+    defaultInput: DEFAULT_LIST_INPUT,
+    arrayControls: false,
+    searchControls: false,
+    newLabel: "new list",
+  },
+  trees: {
+    title: "Trees",
+    kind: "tree",
+    viz: "tree",
+    algorithms: TREE_ALGORITHMS,
+    sizeMin: 4,
+    sizeMax: 12,
+    defaultInput: DEFAULT_TREE_INPUT,
+    arrayControls: false,
+    searchControls: false,
+    newLabel: "new tree",
+  },
+  graphs: {
+    title: "Graphs",
+    kind: "graph",
+    viz: "graph",
+    algorithms: GRAPH_ALGORITHMS,
+    sizeMin: 5,
+    sizeMax: 10,
+    defaultInput: DEFAULT_GRAPH_INPUT,
+    arrayControls: false,
+    searchControls: false,
+    newLabel: "new graph",
+  },
+  dp: {
+    title: "Dynamic programming",
+    kind: "dp",
+    viz: "array",
+    algorithms: DP_ALGORITHMS,
+    sizeMin: 4,
+    sizeMax: 16,
+    defaultInput: DEFAULT_INPUT,
+    arrayControls: true,
+    searchControls: false,
+    newLabel: "new array",
   },
 };
 
@@ -87,32 +180,23 @@ const Icon = {
 };
 
 export function Playground({ topic }: { topic: TopicId }) {
-  const { title, kind, algorithms } = TOPICS[topic];
-  const isSearch = kind === "search";
-  const isList = kind === "list";
-  const sizeMin = isList ? 3 : 5;
-  const sizeMax = isList ? 12 : 24;
+  const cfg = TOPICS[topic];
+  const { title, kind, viz, algorithms } = cfg;
 
   const [algId, setAlgId] = useState(algorithms[0].id);
-  const [input, setInput] = useState<number[]>(
-    isSearch ? DEFAULT_SEARCH_INPUT : isList ? DEFAULT_LIST_INPUT : DEFAULT_INPUT,
-  );
+  const [input, setInput] = useState<number[]>(cfg.defaultInput);
+  const [size, setSize] = useState(cfg.defaultInput.length);
   const [target, setTarget] = useState(DEFAULT_TARGET);
   const [targetText, setTargetText] = useState(String(DEFAULT_TARGET));
-  const [sortPreset, setSortPreset] = useState<Preset>("random");
+  const [preset, setPreset] = useState<Preset>("random");
   const [searchPreset, setSearchPreset] = useState<SearchPreset>("distinct");
-  const [size, setSize] = useState(
-    isSearch
-      ? DEFAULT_SEARCH_INPUT.length
-      : isList
-        ? DEFAULT_LIST_INPUT.length
-        : DEFAULT_INPUT.length,
-  );
   const [custom, setCustom] = useState("");
   const [customBad, setCustomBad] = useState(false);
   const [param, setParam] = useState<number | null>(null);
 
   const alg = algorithms.find((a) => a.id === algId) ?? algorithms[0];
+  const wantsTarget = cfg.searchControls || !!alg.usesTarget;
+
   const paramMax = alg.param
     ? Math.min(alg.param.max, input.length)
     : undefined;
@@ -122,9 +206,10 @@ export function Playground({ topic }: { topic: TopicId }) {
         Math.min(param ?? alg.param.default, paramMax ?? alg.param.max),
       )
     : undefined;
+
   const steps = useMemo(
-    () => alg.trace(input, isSearch ? target : paramVal),
-    [alg, input, isSearch, target, paramVal],
+    () => alg.trace(input, wantsTarget ? target : paramVal),
+    [alg, input, wantsTarget, target, paramVal],
   );
 
   const [cursor, setCursor] = useState(0);
@@ -141,7 +226,6 @@ export function Playground({ topic }: { topic: TopicId }) {
     setCursor(0);
     setPlaying(false);
   }
-  // Stop at the last step.
   if (playing && atEnd) setPlaying(false);
 
   useEffect(() => {
@@ -189,25 +273,26 @@ export function Playground({ topic }: { topic: TopicId }) {
     return () => window.removeEventListener("keydown", onKey);
   }, [togglePlay, stepBy]);
 
-  const regenerateSort = (p: Preset, n: number) => {
-    setSortPreset(p);
-    setSize(n);
-    setInput(makeInput(p, n));
-    setCustom("");
-    setCustomBad(false);
-  };
-
-  const regenerateSearch = (p: SearchPreset, n: number) => {
-    setSearchPreset(p);
-    setSize(n);
-    const next = makeSearchInput(p, n);
-    setInput(next);
-    setTargetInner(pickPresent(next));
-  };
-
   const setTargetInner = (v: number) => {
     setTarget(v);
     setTargetText(String(v));
+  };
+
+  const genInput = (n: number, p: Preset, sp: SearchPreset): number[] => {
+    if (cfg.viz === "tree") return makeDistinctInput(n);
+    if (cfg.searchControls) return makeSearchInput(sp, n);
+    return makeInput(p, n);
+  };
+
+  const regenerate = (n: number, p = preset, sp = searchPreset) => {
+    setSize(n);
+    setPreset(p);
+    setSearchPreset(sp);
+    const next = genInput(n, p, sp);
+    setInput(next);
+    setCustom("");
+    setCustomBad(false);
+    if (wantsTarget) setTargetInner(pickPresent(next));
   };
 
   const applyTargetText = () => {
@@ -255,21 +340,32 @@ export function Playground({ topic }: { topic: TopicId }) {
           <section className="card" aria-label="Visualization">
             <div className="card-head">
               <span className="card-title">{alg.name} · live</span>
-              {isSearch ? (
+              {wantsTarget ? (
                 <span className="target-chip">target = {target}</span>
               ) : (
                 <span className="card-sub">{alg.tagline}</span>
               )}
             </div>
 
-            {isList ? (
+            {viz === "list" ? (
               <LinkedListViz step={step} />
+            ) : viz === "tree" ? (
+              <TreeViz step={step} />
+            ) : viz === "graph" ? (
+              <GraphViz step={step} />
             ) : (
               <ArrayViz
                 step={step}
-                reservePointerRow={isSearch}
+                reservePointerRow={cfg.searchControls}
                 stackLabel={alg.stackLabel}
-                onBarClick={isSearch ? setTargetInner : undefined}
+                onBarClick={cfg.searchControls ? setTargetInner : undefined}
+              />
+            )}
+            {(viz === "tree" || viz === "graph") && alg.stackLabel && (
+              <StackStrip
+                step={step}
+                label={alg.stackLabel}
+                mode={viz === "graph" ? "index" : "value"}
               />
             )}
             <VizLegend kind={kind} />
@@ -346,83 +442,30 @@ export function Playground({ topic }: { topic: TopicId }) {
               </div>
             </div>
 
-            {isSearch ? (
-              <div className="data-row">
+            <div className="data-row">
+              {(cfg.arrayControls || cfg.searchControls) && (
                 <label className="field">
                   data
-                  <select
-                    className="select"
-                    value={searchPreset}
-                    onChange={(e) =>
-                      regenerateSearch(e.target.value as SearchPreset, size)
-                    }
-                  >
-                    {SEARCH_PRESETS.map((p) => (
-                      <option key={p.id} value={p.id}>
-                        {p.label}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-                <label className="field">
-                  n = {size}
-                  <input
-                    type="range"
-                    className="size-range"
-                    min={5}
-                    max={24}
-                    value={size}
-                    onChange={(e) =>
-                      regenerateSearch(searchPreset, Number(e.target.value))
-                    }
-                    aria-label="Array size"
-                  />
-                </label>
-                <button
-                  type="button"
-                  className="ghost-btn"
-                  onClick={() => regenerateSearch(searchPreset, size)}
-                >
-                  new array
-                </button>
-                <label className="field">
-                  target
-                  <input
-                    type="text"
-                    inputMode="numeric"
-                    className="text-input is-short"
-                    value={targetText}
-                    onChange={(e) => setTargetText(e.target.value)}
-                    onBlur={applyTargetText}
-                    onKeyDown={(e) => e.key === "Enter" && applyTargetText()}
-                    aria-label="Target value, 1 to 999"
-                  />
-                </label>
-                <button
-                  type="button"
-                  className="ghost-btn"
-                  onClick={() => setTargetInner(pickPresent(input))}
-                >
-                  pick present
-                </button>
-                <button
-                  type="button"
-                  className="ghost-btn"
-                  onClick={() => setTargetInner(pickMissing(input))}
-                >
-                  pick missing
-                </button>
-              </div>
-            ) : (
-              <div className="data-row">
-                {!isList && (
-                  <label className="field">
-                    data
+                  {cfg.searchControls ? (
                     <select
                       className="select"
-                      value={sortPreset}
+                      value={searchPreset}
                       onChange={(e) =>
-                        regenerateSort(e.target.value as Preset, size)
+                        regenerate(size, preset, e.target.value as SearchPreset)
+                      }
+                    >
+                      {SEARCH_PRESETS.map((p) => (
+                        <option key={p.id} value={p.id}>
+                          {p.label}
+                        </option>
+                      ))}
+                    </select>
+                  ) : (
+                    <select
+                      className="select"
+                      value={preset}
+                      onChange={(e) =>
+                        regenerate(size, e.target.value as Preset)
                       }
                     >
                       {PRESETS.map((p) => (
@@ -431,64 +474,106 @@ export function Playground({ topic }: { topic: TopicId }) {
                         </option>
                       ))}
                     </select>
-                  </label>
-                )}
+                  )}
+                </label>
+              )}
+
+              <label className="field">
+                n = {size}
+                <input
+                  type="range"
+                  className="size-range"
+                  min={cfg.sizeMin}
+                  max={cfg.sizeMax}
+                  value={size}
+                  onChange={(e) => regenerate(Number(e.target.value))}
+                  aria-label="Size"
+                />
+              </label>
+
+              <button
+                type="button"
+                className="ghost-btn"
+                onClick={() => regenerate(size)}
+              >
+                {cfg.newLabel}
+              </button>
+
+              {alg.param && (
                 <label className="field">
-                  n = {size}
+                  {alg.param.label} = {paramVal}
                   <input
                     type="range"
                     className="size-range"
-                    min={sizeMin}
-                    max={sizeMax}
-                    value={size}
-                    onChange={(e) =>
-                      regenerateSort(sortPreset, Number(e.target.value))
-                    }
-                    aria-label={isList ? "List length" : "Array size"}
+                    min={alg.param.min}
+                    max={paramMax}
+                    value={paramVal}
+                    onChange={(e) => setParam(Number(e.target.value))}
+                    aria-label={alg.param.label}
                   />
                 </label>
-                <button
-                  type="button"
-                  className="ghost-btn"
-                  onClick={() => regenerateSort(sortPreset, size)}
-                >
-                  {isList ? "new list" : "new array"}
-                </button>
-                {alg.param && (
+              )}
+
+              {wantsTarget && (
+                <>
                   <label className="field">
-                    {alg.param.label} = {paramVal}
+                    target
                     <input
-                      type="range"
-                      className="size-range"
-                      min={alg.param.min}
-                      max={paramMax}
-                      value={paramVal}
-                      onChange={(e) => setParam(Number(e.target.value))}
-                      aria-label={alg.param.label}
+                      type="text"
+                      inputMode="numeric"
+                      className="text-input is-short"
+                      value={targetText}
+                      onChange={(e) => setTargetText(e.target.value)}
+                      onBlur={applyTargetText}
+                      onKeyDown={(e) => e.key === "Enter" && applyTargetText()}
+                      aria-label="Target value, 1 to 999"
                     />
                   </label>
-                )}
-                <label className="field">
-                  own
-                  <input
-                    type="text"
-                    className={`text-input${customBad ? " is-invalid" : ""}`}
-                    placeholder="e.g. 8, 3, 55, 21, 4"
-                    value={custom}
-                    onChange={(e) => {
-                      setCustom(e.target.value);
-                      setCustomBad(false);
-                    }}
-                    onKeyDown={(e) => e.key === "Enter" && applyCustom()}
-                    aria-label="Custom array, comma separated, 2 to 32 values from 1 to 999"
-                    aria-invalid={customBad}
-                  />
-                </label>
-                <button type="button" className="ghost-btn" onClick={applyCustom}>
-                  run it
-                </button>
-              </div>
-            )}
+                  <button
+                    type="button"
+                    className="ghost-btn"
+                    onClick={() => setTargetInner(pickPresent(input))}
+                  >
+                    pick present
+                  </button>
+                  <button
+                    type="button"
+                    className="ghost-btn"
+                    onClick={() => setTargetInner(pickMissing(input))}
+                  >
+                    pick missing
+                  </button>
+                </>
+              )}
+
+              {cfg.arrayControls && (
+                <>
+                  <label className="field">
+                    own
+                    <input
+                      type="text"
+                      className={`text-input${customBad ? " is-invalid" : ""}`}
+                      placeholder="e.g. 8, 3, 55, 21, 4"
+                      value={custom}
+                      onChange={(e) => {
+                        setCustom(e.target.value);
+                        setCustomBad(false);
+                      }}
+                      onKeyDown={(e) => e.key === "Enter" && applyCustom()}
+                      aria-label="Custom array, comma separated, 2 to 32 values from 1 to 999"
+                      aria-invalid={customBad}
+                    />
+                  </label>
+                  <button
+                    type="button"
+                    className="ghost-btn"
+                    onClick={applyCustom}
+                  >
+                    run it
+                  </button>
+                </>
+              )}
+            </div>
           </section>
         </div>
       </div>
@@ -519,5 +604,36 @@ export function Playground({ topic }: { topic: TopicId }) {
         </div>
       </div>
     </>
+  );
+}
+
+/** Chip strip of stack/queue contents for tree & graph vizzes. */
+function StackStrip({
+  step,
+  label,
+  mode,
+}: {
+  step: import("@/lib/trace").Step;
+  label: string;
+  mode: "value" | "index";
+}) {
+  const stack = step.hl.stack;
+  if (stack === undefined) return null;
+  const n = step.cells.length;
+  return (
+    <div className="stack-row" aria-label="Frontier contents">
+      <span className="stack-label">{label}</span>
+      {stack.length === 0 ? (
+        <span className="stack-empty">empty</span>
+      ) : (
+        stack
+          .filter((i) => i >= 0 && i < n)
+          .map((i, k) => (
+            <span key={k} className="stack-chip">
+              {mode === "index" ? i : step.cells[i].value}
+            </span>
+          ))
+      )}
+    </div>
   );
 }

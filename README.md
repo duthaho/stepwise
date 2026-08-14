@@ -11,17 +11,32 @@ npm install
 npm run dev        # http://localhost:3000
 ```
 
+Seven topics, 23 algorithms:
+
+- **Sorting** — bubble, insertion, selection, merge, quick
+- **Searching** — linear, binary, lower bound
+- **Linked lists** — reverse, find middle, cycle detection
+- **Stacks & queues** — next greater, sliding window max, largest rectangle
+- **Trees** — BST insert, BST search, in-order traversal
+- **Graphs** — BFS, DFS, Dijkstra
+- **Dynamic programming** — min-cost stairs, house robber, LIS
+
 ## How it works
 
 The core idea is a **tracer engine**, not hand-made animations per topic.
 
 1. An algorithm runs once, instrumented, and records a `Step[]`:
-   the executing source line, a snapshot of the array, highlight roles
-   (compare / swap / pivot / key / active range), and a one-line narration.
+   the executing source line, a snapshot of the data, highlight roles
+   (compare / swap / pivot / key / stack / pointers / tree / graph edges /
+   labels …), and a one-line narration.
 2. The UI never runs the algorithm — the player just scrubs an index over
    that array. Stepping backward is free.
-3. Array cells carry stable ids, so bars are keyed by identity and swaps
-   animate as physical slides (CSS `transform` transitions only).
+3. Cells carry stable ids, so elements are keyed by identity and moves
+   animate as physical transitions (CSS `transform` only).
+4. Four visualizations render from the same `Step`: an array of bars, a
+   linked-list of boxes-and-arrows (SVG), a 2D binary tree (SVG), and a
+   circular graph with weighted edges (SVG). Which one a topic uses is a
+   single field in its config.
 
 ```
 lib/trace.ts            Step / Highlight types + the Tracer recorder
