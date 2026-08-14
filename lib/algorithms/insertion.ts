@@ -16,13 +16,13 @@ export const insertionSort: Algorithm = {
   }
   return a;
 }`,
-  complexity: {
-    best: "O(n)",
-    average: "O(n²)",
-    worst: "O(n²)",
-    space: "O(1)",
-    stable: "yes",
-  },
+  facts: [
+    { label: "best", value: "O(n)" },
+    { label: "average", value: "O(n²)" },
+    { label: "worst", value: "O(n²)" },
+    { label: "space", value: "O(1)" },
+    { label: "stable", value: "yes" },
+  ],
   intuition: [
     "Think of sorting a hand of cards: everything to your left is already ordered, and you insert the next card by sliding it leftward past every larger card. The prefix a[0..i−1] is always sorted — that invariant is the whole algorithm.",
     "Insertion sort is adaptive: on a nearly-sorted array the while-loop barely runs, giving O(n + d) where d is the number of inversions. This is why it appears inside real sorts — Timsort and most quicksort implementations hand small or nearly-sorted runs to insertion sort. Try the “Nearly sorted” preset and watch how little work it does.",

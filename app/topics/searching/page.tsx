@@ -3,12 +3,12 @@ import Link from "next/link";
 import { Playground } from "@/components/playground";
 
 export const metadata: Metadata = {
-  title: "Sorting — Stepwise",
+  title: "Searching — Stepwise",
   description:
-    "Step through bubble, insertion, selection, merge and quick sort line by line with a synced array visualization.",
+    "Step through linear search, binary search and lower bound line by line — watch the candidate window shrink and the pointers move.",
 };
 
-export default function SortingPage() {
+export default function SearchingPage() {
   return (
     <>
       <header className="wrap">
@@ -23,7 +23,7 @@ export default function SortingPage() {
       </header>
 
       <main className="wrap">
-        <Playground topic="sorting" />
+        <Playground topic="searching" />
       </main>
 
       <footer className="foot">

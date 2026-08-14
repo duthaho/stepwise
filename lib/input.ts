@@ -39,6 +39,46 @@ export function makeInput(preset: Preset, n: number): number[] {
   }
 }
 
+/* ---------- searching ---------- */
+
+export type SearchPreset = "distinct" | "duplicates";
+
+export const SEARCH_PRESETS: { id: SearchPreset; label: string }[] = [
+  { id: "distinct", label: "Distinct" },
+  { id: "duplicates", label: "Duplicates" },
+];
+
+/** Deterministic defaults so server and client render the same first frame. */
+export const DEFAULT_SEARCH_INPUT = [5, 13, 21, 25, 31, 42, 54, 60, 67, 76, 88, 95];
+export const DEFAULT_TARGET = 54;
+
+export function makeSearchInput(preset: SearchPreset, n: number): number[] {
+  if (preset === "duplicates") {
+    const pool = Array.from({ length: Math.max(2, Math.ceil(n / 3)) }, () =>
+      randInt(5, 99),
+    );
+    return Array.from({ length: n }, () => pool[randInt(0, pool.length - 1)]).sort(
+      (a, b) => a - b,
+    );
+  }
+  const set = new Set<number>();
+  while (set.size < n) set.add(randInt(5, 99));
+  return [...set].sort((a, b) => a - b);
+}
+
+export function pickPresent(a: number[]): number {
+  return a[randInt(0, a.length - 1)];
+}
+
+export function pickMissing(a: number[]): number {
+  const present = new Set(a);
+  for (let tries = 0; tries < 200; tries++) {
+    const v = randInt(1, 99);
+    if (!present.has(v)) return v;
+  }
+  return 100;
+}
+
 export function parseCustomInput(raw: string): number[] | null {
   const parts = raw
     .split(/[\s,]+/)

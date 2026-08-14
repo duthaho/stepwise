@@ -18,13 +18,13 @@ export const quickSort: Algorithm = {
   quickSort(a, lo, i - 1);
   quickSort(a, i + 1, hi);
 }`,
-  complexity: {
-    best: "O(n log n)",
-    average: "O(n log n)",
-    worst: "O(n²)",
-    space: "O(log n)",
-    stable: "no",
-  },
+  facts: [
+    { label: "best", value: "O(n log n)" },
+    { label: "average", value: "O(n log n)" },
+    { label: "worst", value: "O(n²)" },
+    { label: "space", value: "O(log n)" },
+    { label: "stable", value: "no" },
+  ],
   intuition: [
     "One partition pass does something permanent: every element smaller than the pivot ends up left of it, everything else right — so the pivot lands in its final sorted position and never moves again. Sorting reduces to two smaller independent problems on either side. Watch the dimmed bars: only the active window is ever touched.",
     "This is Lomuto partitioning: i is the boundary of the “smaller than pivot” zone, j scans ahead, and anything small gets swapped back into the zone. Interviewers often ask for Hoare’s scheme as a follow-up — fewer swaps, but the pivot does not land in final position.",

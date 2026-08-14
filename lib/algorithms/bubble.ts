@@ -18,13 +18,13 @@ export const bubbleSort: Algorithm = {
   }
   return a;
 }`,
-  complexity: {
-    best: "O(n)",
-    average: "O(n²)",
-    worst: "O(n²)",
-    space: "O(1)",
-    stable: "yes",
-  },
+  facts: [
+    { label: "best", value: "O(n)" },
+    { label: "average", value: "O(n²)" },
+    { label: "worst", value: "O(n²)" },
+    { label: "space", value: "O(1)" },
+    { label: "stable", value: "yes" },
+  ],
   intuition: [
     "Each pass walks the array comparing neighbours and swapping any pair that is out of order. After pass one, the largest element has bubbled to the last slot; after pass two, the second largest is in place — so every pass shrinks the unsorted region by one from the right.",
     "The swapped flag is the detail interviewers probe: if a full pass makes zero swaps, the array is already sorted and the loop exits early. That is what makes the best case O(n) instead of O(n²) — worth saying out loud before you are asked.",

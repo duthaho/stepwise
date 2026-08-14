@@ -21,13 +21,13 @@ export const mergeSort: Algorithm = {
     a[lo + k] = merged[k];
   }
 }`,
-  complexity: {
-    best: "O(n log n)",
-    average: "O(n log n)",
-    worst: "O(n log n)",
-    space: "O(n)",
-    stable: "yes",
-  },
+  facts: [
+    { label: "best", value: "O(n log n)" },
+    { label: "average", value: "O(n log n)" },
+    { label: "worst", value: "O(n log n)" },
+    { label: "space", value: "O(n)" },
+    { label: "stable", value: "yes" },
+  ],
   intuition: [
     "Divide until every window holds one element — a single element is trivially sorted. Then merge sorted runs pairwise: since both runs are sorted, the smallest remaining element is always at the front of one of them, so one linear pass zips them into a bigger sorted run. log n levels of merging, linear work per level: O(n log n) — guaranteed, on every input.",
     "The ≤ in the comparison is what makes it stable: on a tie the left run's element goes first, preserving original order of equal keys. Try the “Few unique” preset and watch ties resolve left-first. That guarantee is why mergesort variants (Timsort) back the standard sort in Python and Java for objects.",

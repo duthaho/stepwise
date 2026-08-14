@@ -22,6 +22,10 @@ export type Highlight = {
   key?: number;
   /** Active window [lo, hi] — bars outside are dimmed. */
   range?: [number, number];
+  /** Labelled index markers rendered under the bars (lo / mid / hi …). */
+  pointers?: Record<string, number>;
+  /** Index where a search concluded. */
+  found?: number;
 };
 
 export type Step = {
@@ -33,23 +37,18 @@ export type Step = {
   hl: Highlight;
 };
 
-export type Complexity = {
-  best: string;
-  average: string;
-  worst: string;
-  space: string;
-  stable: "yes" | "no";
-};
+export type Fact = { label: string; value: string };
 
 export type Algorithm = {
   id: string;
   name: string;
   tagline: string;
   code: string;
-  complexity: Complexity;
+  facts: Fact[];
   /** Paragraphs: intuition first, then interview notes. */
   intuition: string[];
-  trace: (input: number[]) => Step[];
+  /** `target` is used by searching algorithms; sorting ignores it. */
+  trace: (input: number[], target?: number) => Step[];
 };
 
 export function toCells(values: number[]): Cell[] {

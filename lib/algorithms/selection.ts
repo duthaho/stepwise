@@ -17,13 +17,13 @@ export const selectionSort: Algorithm = {
   }
   return a;
 }`,
-  complexity: {
-    best: "O(n²)",
-    average: "O(n²)",
-    worst: "O(n²)",
-    space: "O(1)",
-    stable: "no",
-  },
+  facts: [
+    { label: "best", value: "O(n²)" },
+    { label: "average", value: "O(n²)" },
+    { label: "worst", value: "O(n²)" },
+    { label: "space", value: "O(1)" },
+    { label: "stable", value: "no" },
+  ],
   intuition: [
     "Selection sort splits the array into a sorted prefix and an unsorted suffix. Each round it scans the whole suffix for the minimum, then makes exactly one swap to extend the prefix. The sorted region grows from the left, one guaranteed-correct element at a time.",
     "The signature property: at most n − 1 swaps total — the fewest of any comparison sort. When writes are expensive (flash memory, huge records) that matters. The cost is that comparisons never shrink: even a sorted input takes the full O(n²) scan, because the algorithm cannot know the minimum without looking at everything.",

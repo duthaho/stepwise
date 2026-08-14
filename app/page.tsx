@@ -14,7 +14,9 @@ const TOPICS: {
   },
   {
     name: "Searching",
-    desc: "Binary search and the invariants that make it hard to get right.",
+    desc: "Linear, binary, lower bound — and the invariants that make binary search hard to get right.",
+    href: "/topics/searching",
+    count: "3 algorithms",
   },
   {
     name: "Linked lists",
