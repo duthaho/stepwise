@@ -51,6 +51,7 @@ export const SEARCH_PRESETS: { id: SearchPreset; label: string }[] = [
 /** Deterministic defaults so server and client render the same first frame. */
 export const DEFAULT_SEARCH_INPUT = [5, 13, 21, 25, 31, 42, 54, 60, 67, 76, 88, 95];
 export const DEFAULT_TARGET = 54;
+export const DEFAULT_LIST_INPUT = [42, 9, 67, 25, 88, 13, 54, 31];
 
 export function makeSearchInput(preset: SearchPreset, n: number): number[] {
   if (preset === "duplicates") {

@@ -5,10 +5,12 @@ import {
   SORTING_ALGORITHMS,
   SEARCHING_ALGORITHMS,
   STACK_ALGORITHMS,
+  LIST_ALGORITHMS,
 } from "@/lib/algorithms";
 import { Algorithm } from "@/lib/trace";
 import {
   DEFAULT_INPUT,
+  DEFAULT_LIST_INPUT,
   DEFAULT_SEARCH_INPUT,
   DEFAULT_TARGET,
   makeInput,
@@ -23,15 +25,20 @@ import {
 } from "@/lib/input";
 import { CodePanel } from "./code-panel";
 import { ArrayViz, VizLegend } from "./array-viz";
+import { LinkedListViz } from "./linked-list-viz";
 
 const SPEEDS = [0.5, 1, 2, 4];
 const BASE_MS = 600;
 
-export type TopicId = "sorting" | "searching" | "stacks";
+export type TopicId = "sorting" | "searching" | "stacks" | "linked-lists";
 
 const TOPICS: Record<
   TopicId,
-  { title: string; kind: "sort" | "search" | "stack"; algorithms: Algorithm[] }
+  {
+    title: string;
+    kind: "sort" | "search" | "stack" | "list";
+    algorithms: Algorithm[];
+  }
 > = {
   sorting: { title: "Sorting", kind: "sort", algorithms: SORTING_ALGORITHMS },
   searching: {
@@ -43,6 +50,11 @@ const TOPICS: Record<
     title: "Stacks & queues",
     kind: "stack",
     algorithms: STACK_ALGORITHMS,
+  },
+  "linked-lists": {
+    title: "Linked lists",
+    kind: "list",
+    algorithms: LIST_ALGORITHMS,
   },
 };
 
@@ -77,17 +89,24 @@ const Icon = {
 export function Playground({ topic }: { topic: TopicId }) {
   const { title, kind, algorithms } = TOPICS[topic];
   const isSearch = kind === "search";
+  const isList = kind === "list";
+  const sizeMin = isList ? 3 : 5;
+  const sizeMax = isList ? 12 : 24;
 
   const [algId, setAlgId] = useState(algorithms[0].id);
   const [input, setInput] = useState<number[]>(
-    isSearch ? DEFAULT_SEARCH_INPUT : DEFAULT_INPUT,
+    isSearch ? DEFAULT_SEARCH_INPUT : isList ? DEFAULT_LIST_INPUT : DEFAULT_INPUT,
   );
   const [target, setTarget] = useState(DEFAULT_TARGET);
   const [targetText, setTargetText] = useState(String(DEFAULT_TARGET));
   const [sortPreset, setSortPreset] = useState<Preset>("random");
   const [searchPreset, setSearchPreset] = useState<SearchPreset>("distinct");
   const [size, setSize] = useState(
-    isSearch ? DEFAULT_SEARCH_INPUT.length : DEFAULT_INPUT.length,
+    isSearch
+      ? DEFAULT_SEARCH_INPUT.length
+      : isList
+        ? DEFAULT_LIST_INPUT.length
+        : DEFAULT_INPUT.length,
   );
   const [custom, setCustom] = useState("");
   const [customBad, setCustomBad] = useState(false);
@@ -243,12 +262,16 @@ export function Playground({ topic }: { topic: TopicId }) {
               )}
             </div>
 
-            <ArrayViz
-              step={step}
-              reservePointerRow={isSearch}
-              stackLabel={alg.stackLabel}
-              onBarClick={isSearch ? setTargetInner : undefined}
-            />
+            {isList ? (
+              <LinkedListViz step={step} />
+            ) : (
+              <ArrayViz
+                step={step}
+                reservePointerRow={isSearch}
+                stackLabel={alg.stackLabel}
+                onBarClick={isSearch ? setTargetInner : undefined}
+              />
+            )}
             <VizLegend kind={kind} />
 
             <div className="narr">
@@ -392,34 +415,36 @@ export function Playground({ topic }: { topic: TopicId }) {
               </div>
             ) : (
               <div className="data-row">
-                <label className="field">
-                  data
-                  <select
-                    className="select"
-                    value={sortPreset}
-                    onChange={(e) =>
-                      regenerateSort(e.target.value as Preset, size)
-                    }
-                  >
-                    {PRESETS.map((p) => (
-                      <option key={p.id} value={p.id}>
-                        {p.label}
-                      </option>
-                    ))}
-                  </select>
-                </label>
+                {!isList && (
+                  <label className="field">
+                    data
+                    <select
+                      className="select"
+                      value={sortPreset}
+                      onChange={(e) =>
+                        regenerateSort(e.target.value as Preset, size)
+                      }
+                    >
+                      {PRESETS.map((p) => (
+                        <option key={p.id} value={p.id}>
+                          {p.label}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                )}
                 <label className="field">
                   n = {size}
                   <input
                     type="range"
                     className="size-range"
-                    min={5}
-                    max={24}
+                    min={sizeMin}
+                    max={sizeMax}
                     value={size}
                     onChange={(e) =>
                       regenerateSort(sortPreset, Number(e.target.value))
                     }
-                    aria-label="Array size"
+                    aria-label={isList ? "List length" : "Array size"}
                   />
                 </label>
                 <button
@@ -427,7 +452,7 @@ export function Playground({ topic }: { topic: TopicId }) {
                   className="ghost-btn"
                   onClick={() => regenerateSort(sortPreset, size)}
                 >
-                  new array
+                  {isList ? "new list" : "new array"}
                 </button>
                 {alg.param && (
                   <label className="field">

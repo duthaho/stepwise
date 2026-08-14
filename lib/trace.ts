@@ -30,6 +30,8 @@ export type Highlight = {
   stack?: number[];
   /** A candidate rectangle drawn over the bars (histogram problems). */
   area?: { from: number; to: number; height: number };
+  /** Linked-list pointer state: links[i] = index node i points to, or null. */
+  links?: (number | null)[];
 };
 
 export type Step = {

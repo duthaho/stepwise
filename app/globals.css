@@ -577,6 +577,85 @@ a.topic-row:hover .topic-name {
   pointer-events: none;
 }
 
+/* ---------- linked-list stage ---------- */
+
+.list-stage {
+  padding: var(--space-lg) var(--space-md) var(--space-xs);
+}
+
+.list-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 240px;
+  font-family: var(--font-mono);
+}
+
+.list-node {
+  fill: var(--color-paper-3);
+  stroke: var(--color-rule);
+  stroke-width: 1;
+}
+.list-node[data-state="compare"] {
+  fill: var(--color-viz-compare);
+  stroke: var(--color-viz-compare);
+}
+.list-node[data-state="swap"] {
+  fill: var(--color-viz-swap);
+  stroke: var(--color-viz-swap);
+}
+.list-node[data-state="done"] {
+  fill: var(--color-viz-done);
+  stroke: var(--color-viz-done);
+}
+.list-node[data-state="found"] {
+  fill: var(--color-viz-done);
+  stroke: var(--color-accent);
+  stroke-width: 2;
+}
+
+.list-val {
+  fill: var(--color-muted);
+  font-size: 13px;
+  text-anchor: middle;
+  font-variant-numeric: tabular-nums;
+}
+.list-val[data-state="compare"],
+.list-val[data-state="swap"],
+.list-val[data-state="done"],
+.list-val[data-state="found"] {
+  fill: var(--color-viz-ink-on);
+  font-weight: 700;
+}
+
+.list-arrow {
+  fill: none;
+  stroke: var(--color-neutral);
+  stroke-width: 1.5;
+}
+.list-arrow.is-hot {
+  stroke: var(--color-viz-swap);
+  stroke-width: 2;
+}
+.list-ah-muted {
+  fill: var(--color-neutral);
+}
+.list-ah-hot {
+  fill: var(--color-viz-swap);
+}
+
+.list-null {
+  fill: var(--color-neutral);
+  font-size: 13px;
+  text-anchor: middle;
+}
+
+.list-ptr {
+  fill: var(--color-accent);
+  font-size: 11px;
+  text-anchor: middle;
+}
+
 /* stack / deque chip strip */
 .stack-row {
   display: flex;

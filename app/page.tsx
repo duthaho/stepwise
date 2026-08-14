@@ -20,7 +20,9 @@ const TOPICS: {
   },
   {
     name: "Linked lists",
-    desc: "Pointer surgery, slow/fast runners, cycle detection.",
+    desc: "Reverse in place, fast & slow runners, Floyd's cycle detection — arrows and all.",
+    href: "/topics/linked-lists",
+    count: "3 algorithms",
   },
   {
     name: "Stacks & queues",

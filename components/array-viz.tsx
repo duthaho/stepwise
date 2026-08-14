@@ -138,7 +138,11 @@ export function ArrayViz({
   );
 }
 
-export function VizLegend({ kind }: { kind: "sort" | "search" | "stack" }) {
+export function VizLegend({
+  kind,
+}: {
+  kind: "sort" | "search" | "stack" | "list";
+}) {
   const items: { label: string; token: string }[] =
     kind === "sort"
       ? [
@@ -153,12 +157,19 @@ export function VizLegend({ kind }: { kind: "sort" | "search" | "stack" }) {
             { label: "found", token: "var(--color-viz-done)" },
             { label: "candidates", token: "var(--color-viz-bar)" },
           ]
-        : [
-            { label: "current", token: "var(--color-viz-compare)" },
-            { label: "on the stack", token: "var(--color-viz-stack)" },
-            { label: "resolved", token: "var(--color-viz-done)" },
-            { label: "untouched", token: "var(--color-viz-bar)" },
-          ];
+        : kind === "stack"
+          ? [
+              { label: "current", token: "var(--color-viz-compare)" },
+              { label: "on the stack", token: "var(--color-viz-stack)" },
+              { label: "resolved", token: "var(--color-viz-done)" },
+              { label: "untouched", token: "var(--color-viz-bar)" },
+            ]
+          : [
+              { label: "visiting", token: "var(--color-viz-compare)" },
+              { label: "rewiring", token: "var(--color-viz-swap)" },
+              { label: "processed", token: "var(--color-viz-done)" },
+              { label: "node", token: "var(--color-viz-bar)" },
+            ];
   return (
     <div className="legend" aria-hidden="true">
       {items.map((it) => (
@@ -169,6 +180,9 @@ export function VizLegend({ kind }: { kind: "sort" | "search" | "stack" }) {
       ))}
       {kind === "search" && (
         <span className="legend-item legend-hint">dimmed = eliminated · click a bar to search for it</span>
+      )}
+      {kind === "list" && (
+        <span className="legend-item legend-hint">∅ = null pointer</span>
       )}
     </div>
   );
